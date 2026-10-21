@@ -54,6 +54,21 @@ function getFilteredTodos() {
 }
 
 /**
+ * Retourne le message à afficher lorsque la liste filtrée est vide.
+ * @returns {string}
+ */
+function getEmptyStateMessage() {
+  switch (currentFilter) {
+    case "active":
+      return "Aucune tâche en cours. Bien joué ! 🎉";
+    case "completed":
+      return "Aucune tâche terminée pour le moment.";
+    default:
+      return "Votre liste est vide. Ajoutez votre première tâche ! ✨";
+  }
+}
+
+/**
  * Affiche la liste des tâches dans le DOM.
  */
 function render() {
@@ -61,28 +76,35 @@ function render() {
 
   const filteredTodos = getFilteredTodos();
 
-  filteredTodos.forEach((todo) => {
-    const li = document.createElement("li");
-    li.className = `todo-item${todo.completed ? " completed" : ""}`;
-    li.dataset.id = todo.id;
+  if (filteredTodos.length === 0) {
+    const emptyState = document.createElement("li");
+    emptyState.className = "empty-state";
+    emptyState.textContent = getEmptyStateMessage();
+    list.appendChild(emptyState);
+  } else {
+    filteredTodos.forEach((todo) => {
+      const li = document.createElement("li");
+      li.className = `todo-item${todo.completed ? " completed" : ""}`;
+      li.dataset.id = todo.id;
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = todo.completed;
-    checkbox.addEventListener("change", () => toggleTodo(todo.id));
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.completed;
+      checkbox.addEventListener("change", () => toggleTodo(todo.id));
 
-    const span = document.createElement("span");
-    span.textContent = todo.text;
+      const span = document.createElement("span");
+      span.textContent = todo.text;
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
-    deleteBtn.setAttribute("aria-label", "Supprimer la tâche");
-    deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "✕";
+      deleteBtn.setAttribute("aria-label", "Supprimer la tâche");
+      deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
 
-    li.append(checkbox, span, deleteBtn);
-    list.appendChild(li);
-  });
+      li.append(checkbox, span, deleteBtn);
+      list.appendChild(li);
+    });
+  }
 
   const remaining = todos.filter((todo) => !todo.completed).length;
   countLabel.textContent = `${remaining} tâche(s) restante(s)`;
