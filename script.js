@@ -4,6 +4,7 @@
 // ---------------------------------------------------------
 
 const STORAGE_KEY = "todo-app-tasks";
+const THEME_STORAGE_KEY = "todo-app-theme";
 
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
@@ -11,6 +12,7 @@ const list = document.getElementById("todo-list");
 const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const themeToggleBtn = document.getElementById("theme-toggle");
 
 let todos = loadTodos();
 let currentFilter = "all";
@@ -69,6 +71,39 @@ function getEmptyStateMessage() {
 }
 
 /**
+ * Remplace le texte d'une tâche par un champ de saisie éditable.
+ * @param {HTMLElement} li
+ * @param {{id: string, text: string}} todo
+ */
+function enableEditMode(li, todo) {
+  const span = li.querySelector("span");
+
+  const editInput = document.createElement("input");
+  editInput.type = "text";
+  editInput.className = "edit-input";
+  editInput.value = todo.text;
+
+  li.replaceChild(editInput, span);
+  editInput.focus();
+  editInput.setSelectionRange(editInput.value.length, editInput.value.length);
+
+  const commitEdit = () => {
+    updateTodoText(todo.id, editInput.value);
+  };
+
+  editInput.addEventListener("blur", commitEdit);
+  editInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      editInput.blur();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      render(); // annule l'édition sans sauvegarder
+    }
+  });
+}
+
+/**
  * Affiche la liste des tâches dans le DOM.
  */
 function render() {
@@ -94,6 +129,8 @@ function render() {
 
       const span = document.createElement("span");
       span.textContent = todo.text;
+      span.title = "Double-cliquez pour modifier";
+      span.addEventListener("dblclick", () => enableEditMode(li, todo));
 
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
@@ -136,6 +173,27 @@ function toggleTodo(id) {
 }
 
 /**
+ * Met à jour le texte d'une tâche existante.
+ * Si le nouveau texte est vide, la tâche est supprimée.
+ * @param {string} id
+ * @param {string} newText
+ */
+function updateTodoText(id, newText) {
+  const trimmed = newText.trim();
+
+  if (!trimmed) {
+    deleteTodo(id);
+    return;
+  }
+
+  todos = todos.map((todo) =>
+    todo.id === id ? { ...todo, text: trimmed } : todo
+  );
+  saveTodos();
+  render();
+}
+
+/**
  * Supprime une tâche.
  * @param {string} id
  */
@@ -152,6 +210,40 @@ function clearCompleted() {
   todos = todos.filter((todo) => !todo.completed);
   saveTodos();
   render();
+}
+
+// --- Gestion du thème (clair / sombre) ---
+
+/**
+ * Applique le thème donné au document et met à jour l'icône du bouton.
+ * @param {"light" | "dark"} theme
+ */
+function applyTheme(theme) {
+  document.body.classList.toggle("dark", theme === "dark");
+  themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+/**
+ * Initialise le thème depuis le localStorage, ou selon les préférences système.
+ */
+function initTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  const theme = savedTheme || (prefersDark ? "dark" : "light");
+  applyTheme(theme);
+}
+
+/**
+ * Bascule entre thème clair et sombre, et sauvegarde le choix.
+ */
+function toggleTheme() {
+  const isDark = document.body.classList.contains("dark");
+  const newTheme = isDark ? "light" : "dark";
+  applyTheme(newTheme);
+  localStorage.setItem(THEME_STORAGE_KEY, newTheme);
 }
 
 // --- Écouteurs d'évènements ---
@@ -174,5 +266,8 @@ filterButtons.forEach((button) => {
   });
 });
 
-// --- Rendu initial ---
+themeToggleBtn.addEventListener("click", toggleTheme);
+
+// --- Initialisation ---
+initTheme();
 render();
