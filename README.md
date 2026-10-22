@@ -1,6 +1,6 @@
 # 📝 Todo List App
 
-Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et **JavaScript** vanille (sans framework ni dépendance).
+Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et **JavaScript** vanille (sans framework ni dépendance).(test commit)
 
 ## ✨ Fonctionnalités
 
