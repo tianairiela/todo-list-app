@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   preview:
-    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'main'"
+    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'xx'"
     runs-on: ubuntu-24.04
     concurrency:
       group: 'preview-${{ github.ref_name }}'
@@ -23,7 +23,7 @@ jobs:
           GITHUB_TOKEN: '${{ github.token }}'
         run: 'printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | sshpass -e ssh -o StrictHostKeyChecking=accept-new -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" ''if [ -f deployment/scripts/deploy.sh ]; then bash deployment/scripts/deploy.sh preview; else echo "~/deployment/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''\''''est déployé."; fi'''
   production:
-    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name == 'main'"
+    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name == 'xx'"
     runs-on: ubuntu-24.04
     concurrency:
       group: production
