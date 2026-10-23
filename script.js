@@ -19,7 +19,7 @@ let currentFilter = "all";
 
 /**
  * Charge les tâches depuis le localStorage.
- * @returns {Array<{id: string, text: string, completed: boolean}>}
+ * @returns {Array<{id: string, text: string, completed: boolean, priority?: boolean}>}
  */
 function loadTodos() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -42,17 +42,26 @@ function generateId() {
 }
 
 /**
- * Retourne les tâches filtrées selon le filtre actif.
+ * Retourne les tâches filtrées selon le filtre actif, avec les tâches
+ * prioritaires remontées en tête de liste (tri stable).
  */
 function getFilteredTodos() {
+  let filtered;
+
   switch (currentFilter) {
     case "active":
-      return todos.filter((todo) => !todo.completed);
+      filtered = todos.filter((todo) => !todo.completed);
+      break;
     case "completed":
-      return todos.filter((todo) => todo.completed);
+      filtered = todos.filter((todo) => todo.completed);
+      break;
     default:
-      return todos;
+      filtered = todos;
   }
+
+  return [...filtered].sort(
+    (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0)
+  );
 }
 
 /**
@@ -119,13 +128,27 @@ function render() {
   } else {
     filteredTodos.forEach((todo) => {
       const li = document.createElement("li");
-      li.className = `todo-item${todo.completed ? " completed" : ""}`;
+      li.className = `todo-item${todo.completed ? " completed" : ""}${
+        todo.priority ? " priority" : ""
+      }`;
       li.dataset.id = todo.id;
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = todo.completed;
       checkbox.addEventListener("change", () => toggleTodo(todo.id));
+
+      const priorityBtn = document.createElement("button");
+      priorityBtn.className = "priority-btn";
+      priorityBtn.textContent = todo.priority ? "⭐" : "☆";
+      priorityBtn.setAttribute(
+        "aria-label",
+        todo.priority ? "Retirer la priorité" : "Marquer comme prioritaire"
+      );
+      priorityBtn.title = todo.priority
+        ? "Retirer la priorité"
+        : "Marquer comme prioritaire";
+      priorityBtn.addEventListener("click", () => togglePriority(todo.id));
 
       const span = document.createElement("span");
       span.textContent = todo.text;
@@ -138,7 +161,7 @@ function render() {
       deleteBtn.setAttribute("aria-label", "Supprimer la tâche");
       deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
 
-      li.append(checkbox, span, deleteBtn);
+      li.append(checkbox, priorityBtn, span, deleteBtn);
       list.appendChild(li);
     });
   }
@@ -155,7 +178,12 @@ function addTodo(text) {
   const trimmed = text.trim();
   if (!trimmed) return;
 
-  todos.push({ id: generateId(), text: trimmed, completed: false });
+  todos.push({
+    id: generateId(),
+    text: trimmed,
+    completed: false,
+    priority: false,
+  });
   saveTodos();
   render();
 }
@@ -167,6 +195,18 @@ function addTodo(text) {
 function toggleTodo(id) {
   todos = todos.map((todo) =>
     todo.id === id ? { ...todo, completed: !todo.completed } : todo
+  );
+  saveTodos();
+  render();
+}
+
+/**
+ * Bascule l'état "prioritaire" d'une tâche.
+ * @param {string} id
+ */
+function togglePriority(id) {
+  todos = todos.map((todo) =>
+    todo.id === id ? { ...todo, priority: !todo.priority } : todo
   );
   saveTodos();
   render();
