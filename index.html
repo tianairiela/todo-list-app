@@ -8,7 +8,12 @@
 </head>
 <body>
   <main class="todo-app">
-    <h1>📝 Ma Todo List</h1>
+    <div class="todo-header">
+      <h1>📝 Ma Todo List</h1>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Changer de thème" title="Changer de thème">
+        🌙
+      </button>
+    </div>
 
     <form id="todo-form" class="todo-form">
       <input
@@ -16,6 +21,7 @@
         id="todo-input"
         placeholder="Ajouter une nouvelle tâche..."
         autocomplete="off"
+        autofocus
         required
       />
       <button type="submit">Ajouter</button>
