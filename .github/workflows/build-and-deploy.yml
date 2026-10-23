@@ -7,7 +7,7 @@ name: 'Build and deploy tianairiela/todo-list-app'
 permissions:
   contents: read
 jobs:
-  preview:
+  prxxeview:
     if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'main'"
     runs-on: ubuntu-24.04
     concurrency:
