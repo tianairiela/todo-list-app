@@ -115,6 +115,31 @@ body.dark .todo-form .todo-date-input {
   opacity: 0.9;
 }
 
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #764ba2;
+}
+
+body.dark .search-input {
+  background: #2c2440;
+  border-color: #3a3350;
+  color: #eee;
+}
+
 .filters {
   display: flex;
   gap: 0.5rem;
