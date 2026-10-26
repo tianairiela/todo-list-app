@@ -4,6 +4,7 @@
 // ---------------------------------------------------------
 
 const STORAGE_KEY = "todo-app-tasks";
+const THEME_STORAGE_KEY = "todo-app-theme";
 
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
@@ -11,6 +12,7 @@ const list = document.getElementById("todo-list");
 const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const themeToggleBtn = document.getElementById("theme-toggle");
 
 let todos = loadTodos();
 let currentFilter = "all";
@@ -216,6 +218,40 @@ function clearCompleted() {
   render();
 }
 
+/**
+ * Charge le thème sauvegardé par l'utilisateur.
+ * @returns {"light"|"dark"}
+ */
+function loadTheme() {
+  return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+}
+
+/**
+ * Applique le thème donné au document et met à jour le bouton toggle.
+ * @param {"light"|"dark"} theme
+ */
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark-theme", isDark);
+  themeToggleBtn.textContent = isDark ? "☀️" : "🌙";
+  themeToggleBtn.setAttribute(
+    "aria-label",
+    isDark ? "Activer le mode clair" : "Activer le mode sombre"
+  );
+}
+
+/**
+ * Bascule entre le mode clair et le mode sombre,
+ * puis sauvegarde le choix dans le localStorage.
+ */
+function toggleTheme() {
+  const newTheme = document.body.classList.contains("dark-theme")
+    ? "light"
+    : "dark";
+  localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+  applyTheme(newTheme);
+}
+
 // --- Écouteurs d'évènements ---
 
 form.addEventListener("submit", (event) => {
@@ -236,5 +272,8 @@ filterButtons.forEach((button) => {
   });
 });
 
-// --- Rendu initial ---
+themeToggleBtn.addEventListener("click", toggleTheme);
+
+// --- Initialisation ---
+applyTheme(loadTheme());
 render();
