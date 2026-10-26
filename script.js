@@ -94,6 +94,8 @@ function render() {
 
       const span = document.createElement("span");
       span.textContent = todo.text;
+      span.title = "Double-cliquez pour modifier la tâche";
+      span.addEventListener("dblclick", () => enterEditMode(li, todo));
 
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
@@ -143,6 +145,66 @@ function deleteTodo(id) {
   todos = todos.filter((todo) => todo.id !== id);
   saveTodos();
   render();
+}
+
+/**
+ * Met à jour le texte d'une tâche existante.
+ * Si le nouveau texte est vide, la modification est ignorée
+ * et le texte précédent est conservé.
+ * @param {string} id
+ * @param {string} newText
+ */
+function updateTodoText(id, newText) {
+  const trimmed = newText.trim();
+  if (!trimmed) {
+    render();
+    return;
+  }
+
+  todos = todos.map((todo) =>
+    todo.id === id ? { ...todo, text: trimmed } : todo
+  );
+  saveTodos();
+  render();
+}
+
+/**
+ * Transforme le texte d'une tâche en champ de saisie éditable.
+ * Validation : touche "Entrée" ou perte de focus.
+ * Annulation : touche "Échap".
+ * @param {HTMLLIElement} li
+ * @param {{id: string, text: string, completed: boolean}} todo
+ */
+function enterEditMode(li, todo) {
+  const span = li.querySelector("span");
+  if (!span) return;
+
+  const editInput = document.createElement("input");
+  editInput.type = "text";
+  editInput.className = "edit-input";
+  editInput.value = todo.text;
+
+  li.replaceChild(editInput, span);
+  editInput.focus();
+  editInput.select();
+
+  let isCancelled = false;
+
+  const commitEdit = () => {
+    if (isCancelled) return;
+    updateTodoText(todo.id, editInput.value);
+  };
+
+  editInput.addEventListener("blur", commitEdit);
+  editInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      editInput.blur();
+    } else if (event.key === "Escape") {
+      isCancelled = true;
+      render();
+    }
+  });
 }
 
 /**
