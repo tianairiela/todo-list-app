@@ -15,6 +15,8 @@ const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const themeToggleBtn = document.getElementById("theme-toggle");
+const exportBtn = document.getElementById("export-btn");
+const importInput = document.getElementById("import-input");
 
 let todos = loadTodos();
 let currentFilter = "all";
@@ -337,6 +339,84 @@ function clearCompleted() {
   render();
 }
 
+// --- Export / Import des tâches ---
+
+/**
+ * Exporte les tâches actuelles dans un fichier JSON téléchargeable.
+ */
+function exportTodos() {
+  const dataStr = JSON.stringify(todos, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const dateSuffix = new Date().toISOString().slice(0, 10);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `todo-list-${dateSuffix}.json`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Vérifie qu'un élément importé respecte la forme minimale attendue
+ * d'une tâche (id, texte et statut).
+ * @param {unknown} item
+ * @returns {boolean}
+ */
+function isValidTodoShape(item) {
+  return (
+    item !== null &&
+    typeof item === "object" &&
+    typeof item.text === "string" &&
+    item.text.trim().length > 0 &&
+    typeof item.completed === "boolean"
+  );
+}
+
+/**
+ * Importe une liste de tâches depuis un fichier JSON, après validation
+ * et normalisation (rétrocompatibilité avec les champs optionnels).
+ * @param {File} file
+ */
+function importTodos(file) {
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    try {
+      const parsed = JSON.parse(event.target.result);
+
+      if (!Array.isArray(parsed) || !parsed.every(isValidTodoShape)) {
+        throw new Error("Structure de fichier invalide");
+      }
+
+      todos = parsed.map((item) => ({
+        id: typeof item.id === "string" ? item.id : generateId(),
+        text: item.text.trim(),
+        completed: Boolean(item.completed),
+        priority: Boolean(item.priority),
+        dueDate: typeof item.dueDate === "string" ? item.dueDate : null,
+      }));
+
+      saveTodos();
+      render();
+      alert(`${todos.length} tâche(s) importée(s) avec succès ✅`);
+    } catch (error) {
+      alert(
+        "❌ Le fichier sélectionné n'est pas un export valide de la Todo List."
+      );
+    }
+  };
+
+  reader.onerror = () => {
+    alert("❌ Impossible de lire le fichier sélectionné.");
+  };
+
+  reader.readAsText(file);
+}
+
 // --- Gestion du thème (clair / sombre) ---
 
 /**
@@ -398,6 +478,16 @@ searchInput.addEventListener("input", (event) => {
 });
 
 themeToggleBtn.addEventListener("click", toggleTheme);
+
+exportBtn.addEventListener("click", exportTodos);
+
+importInput.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    importTodos(file);
+  }
+  importInput.value = ""; // permet de réimporter le même fichier si besoin
+});
 
 // --- Initialisation ---
 initTheme();
