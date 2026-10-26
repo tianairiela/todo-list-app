@@ -10,6 +10,7 @@ Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et *
 - **Marquer une tâche comme prioritaire** ⭐ (remontée automatique en tête de liste)
 - **Ajouter une date d'échéance** 📅 optionnelle, avec mise en évidence des tâches en retard
 - **Rechercher une tâche** 🔍 en temps réel, insensible à la casse et aux accents, combinée aux filtres
+- **Exporter / Importer les tâches** 💾 au format JSON (sauvegarde, transfert entre appareils)
 - Supprimer une tâche
 - Filtrer les tâches : **Toutes** / **En cours** / **Terminées**
 - Supprimer toutes les tâches terminées en un clic
@@ -36,8 +37,13 @@ todo-list-app/
 
 Aucune installation ni serveur n'est nécessaire.
 
+### 💾 Sauvegarder / restaurer ses tâches
+
+- Cliquez sur **⬇️ Exporter** pour télécharger un fichier `todo-list-AAAA-MM-JJ.json` contenant toutes vos tâches.
+- Cliquez sur **⬆️ Importer** et sélectionnez un fichier JSON précédemment exporté pour restaurer vos tâches (remplace la liste actuelle).
+
 ## 🛠️ Technologies
 
 - HTML5
 - CSS3 (flexbox, animations, thème sombre)
-- JavaScript (ES6+, `localStorage`, `Intl`/`Date`, normalisation Unicode)
+- JavaScript (ES6+, `localStorage`, `Blob`/`FileReader`, `Intl`/`Date`, normalisation Unicode)
