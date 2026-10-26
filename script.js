@@ -8,6 +8,7 @@ const THEME_STORAGE_KEY = "todo-app-theme";
 
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
+const dateInput = document.getElementById("todo-date-input");
 const list = document.getElementById("todo-list");
 const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
@@ -19,7 +20,7 @@ let currentFilter = "all";
 
 /**
  * Charge les tâches depuis le localStorage.
- * @returns {Array<{id: string, text: string, completed: boolean, priority?: boolean}>}
+ * @returns {Array<{id: string, text: string, completed: boolean, priority?: boolean, dueDate?: string|null}>}
  */
 function loadTodos() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -77,6 +78,56 @@ function getEmptyStateMessage() {
     default:
       return "Votre liste est vide. Ajoutez votre première tâche ! ✨";
   }
+}
+
+/**
+ * Indique si une tâche est en retard (date d'échéance dépassée et non terminée).
+ * @param {{completed: boolean, dueDate?: string|null}} todo
+ * @returns {boolean}
+ */
+function isOverdue(todo) {
+  if (!todo.dueDate || todo.completed) return false;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const due = new Date(todo.dueDate);
+  due.setHours(0, 0, 0, 0);
+
+  return due < today;
+}
+
+/**
+ * Formate une date ISO (YYYY-MM-DD) au format français JJ/MM/AAAA.
+ * @param {string} isoDate
+ * @returns {string}
+ */
+function formatDate(isoDate) {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+/**
+ * Crée le badge affichant la date d'échéance d'une tâche, le cas échéant.
+ * @param {{dueDate?: string|null}} todo
+ * @returns {HTMLSpanElement|null}
+ */
+function createDueDateBadge(todo) {
+  if (!todo.dueDate) return null;
+
+  const overdue = isOverdue(todo);
+  const badge = document.createElement("span");
+  badge.className = `due-date${overdue ? " overdue" : ""}`;
+  badge.textContent = `📅 ${formatDate(todo.dueDate)}`;
+  badge.title = overdue
+    ? "Tâche en retard"
+    : "Date d'échéance de la tâche";
+
+  return badge;
 }
 
 /**
@@ -155,13 +206,18 @@ function render() {
       span.title = "Double-cliquez pour modifier";
       span.addEventListener("dblclick", () => enableEditMode(li, todo));
 
+      const dueDateBadge = createDueDateBadge(todo);
+
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
       deleteBtn.textContent = "✕";
       deleteBtn.setAttribute("aria-label", "Supprimer la tâche");
       deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
 
-      li.append(checkbox, priorityBtn, span, deleteBtn);
+      li.append(checkbox, priorityBtn, span);
+      if (dueDateBadge) li.append(dueDateBadge);
+      li.append(deleteBtn);
+
       list.appendChild(li);
     });
   }
@@ -173,8 +229,9 @@ function render() {
 /**
  * Ajoute une nouvelle tâche.
  * @param {string} text
+ * @param {string} [dueDate] Date d'échéance optionnelle au format YYYY-MM-DD
  */
-function addTodo(text) {
+function addTodo(text, dueDate) {
   const trimmed = text.trim();
   if (!trimmed) return;
 
@@ -183,6 +240,7 @@ function addTodo(text) {
     text: trimmed,
     completed: false,
     priority: false,
+    dueDate: dueDate || null,
   });
   saveTodos();
   render();
@@ -290,8 +348,9 @@ function toggleTheme() {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  addTodo(input.value);
+  addTodo(input.value, dateInput.value);
   input.value = "";
+  dateInput.value = "";
   input.focus();
 });
 
