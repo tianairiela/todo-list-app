@@ -114,11 +114,22 @@ body {
   flex: 1;
   color: #333;
   word-break: break-word;
+  cursor: text;
 }
 
 .todo-item.completed span {
   text-decoration: line-through;
   color: #aaa;
+}
+
+.todo-item .edit-input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #764ba2;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
 }
 
 .todo-item .delete-btn {
