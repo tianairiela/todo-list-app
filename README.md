@@ -6,6 +6,7 @@ Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et *
 
 - Ajouter une tâche
 - Marquer une tâche comme terminée / en cours
+- **Modifier le texte d'une tâche** (double-clic sur la tâche, validation avec `Entrée`, annulation avec `Échap`)
 - Supprimer une tâche
 - Filtrer les tâches : **Toutes** / **En cours** / **Terminées**
 - Supprimer toutes les tâches terminées en un clic
