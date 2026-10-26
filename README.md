@@ -10,14 +10,15 @@ Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et *
 - Supprimer une tâche
 - Filtrer les tâches : **Toutes** / **En cours** / **Terminées**
 - Supprimer toutes les tâches terminées en un clic
-- **Persistance locale** : les tâches sont sauvegardées dans le `localStorage` du navigateur (elles restent après rafraîchissement de la page)
+- **Mode sombre / clair** 🌙☀️ : bouton de bascule en haut de l'application, préférence mémorisée
+- **Persistance locale** : les tâches et le thème choisi sont sauvegardés dans le `localStorage` du navigateur (ils restent après rafraîchissement de la page)
 
 ## 🗂️ Structure du projet
 
 ```
 todo-list-app/
 ├── index.html    # Structure de la page
-├── style.css     # Styles et mise en page
+├── style.css     # Styles, variables CSS et thèmes
 ├── script.js     # Logique de l'application
 └── README.md
 ```
@@ -35,5 +36,5 @@ Aucune installation ni serveur n'est nécessaire.
 ## 🛠️ Technologies
 
 - HTML5
-- CSS3 (flexbox, animations)
+- CSS3 (flexbox, variables CSS, animations)
 - JavaScript (ES6+, `localStorage`)
