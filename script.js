@@ -9,6 +9,7 @@ const THEME_STORAGE_KEY = "todo-app-theme";
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
 const dateInput = document.getElementById("todo-date-input");
+const searchInput = document.getElementById("search-input");
 const list = document.getElementById("todo-list");
 const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
@@ -17,6 +18,7 @@ const themeToggleBtn = document.getElementById("theme-toggle");
 
 let todos = loadTodos();
 let currentFilter = "all";
+let searchQuery = "";
 
 /**
  * Charge les tâches depuis le localStorage.
@@ -43,8 +45,22 @@ function generateId() {
 }
 
 /**
- * Retourne les tâches filtrées selon le filtre actif, avec les tâches
- * prioritaires remontées en tête de liste (tri stable).
+ * Normalise un texte pour une comparaison insensible à la casse
+ * et aux accents (ex: "Télé" et "tele" deviennent équivalents).
+ * @param {string} text
+ * @returns {string}
+ */
+function normalizeText(text) {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/**
+ * Retourne les tâches filtrées selon le filtre actif et la recherche en cours,
+ * avec les tâches prioritaires remontées en tête de liste (tri stable).
  */
 function getFilteredTodos() {
   let filtered;
@@ -60,6 +76,13 @@ function getFilteredTodos() {
       filtered = todos;
   }
 
+  const normalizedQuery = normalizeText(searchQuery);
+  if (normalizedQuery) {
+    filtered = filtered.filter((todo) =>
+      normalizeText(todo.text).includes(normalizedQuery)
+    );
+  }
+
   return [...filtered].sort(
     (a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0)
   );
@@ -70,6 +93,10 @@ function getFilteredTodos() {
  * @returns {string}
  */
 function getEmptyStateMessage() {
+  if (normalizeText(searchQuery)) {
+    return `Aucune tâche ne correspond à "${searchQuery.trim()}" 🔍`;
+  }
+
   switch (currentFilter) {
     case "active":
       return "Aucune tâche en cours. Bien joué ! 🎉";
@@ -363,6 +390,11 @@ filterButtons.forEach((button) => {
     currentFilter = button.dataset.filter;
     render();
   });
+});
+
+searchInput.addEventListener("input", (event) => {
+  searchQuery = event.target.value;
+  render();
 });
 
 themeToggleBtn.addEventListener("click", toggleTheme);
