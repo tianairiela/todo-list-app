@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   preview:
-    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'feature/edit-and-dark-mode'"
+    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'sfeature/edit-and-dark-mode'"
     runs-on: ubuntu-24.04
     concurrency:
       group: 'preview-${{ github.ref_name }}'
