@@ -57,6 +57,16 @@
       <span id="todo-count">0 tâche(s) restante(s)</span>
       <button id="clear-completed">Supprimer les terminées</button>
     </footer>
+
+    <div class="data-actions">
+      <button id="export-btn" type="button" title="Exporter les tâches dans un fichier JSON">
+        ⬇️ Exporter
+      </button>
+      <label class="import-label" for="import-input" title="Importer des tâches depuis un fichier JSON">
+        ⬆️ Importer
+        <input type="file" id="import-input" accept="application/json" hidden />
+      </label>
+    </div>
   </main>
 
   <script src="script.js"></script>
