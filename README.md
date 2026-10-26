@@ -9,6 +9,7 @@ Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et *
 - **Modifier le texte d'une tâche** (double-clic, validation avec `Entrée`, annulation avec `Échap`)
 - **Marquer une tâche comme prioritaire** ⭐ (remontée automatique en tête de liste)
 - **Ajouter une date d'échéance** 📅 optionnelle, avec mise en évidence des tâches en retard
+- **Rechercher une tâche** 🔍 en temps réel, insensible à la casse et aux accents, combinée aux filtres
 - Supprimer une tâche
 - Filtrer les tâches : **Toutes** / **En cours** / **Terminées**
 - Supprimer toutes les tâches terminées en un clic
@@ -39,4 +40,4 @@ Aucune installation ni serveur n'est nécessaire.
 
 - HTML5
 - CSS3 (flexbox, animations, thème sombre)
-- JavaScript (ES6+, `localStorage`, `Intl`/`Date`)
+- JavaScript (ES6+, `localStorage`, `Intl`/`Date`, normalisation Unicode)
