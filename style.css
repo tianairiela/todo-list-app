@@ -317,6 +317,52 @@ body.dark .todo-footer button {
   color: #a78bda;
 }
 
+.data-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+  transition: border-top-color 0.3s ease;
+}
+
+body.dark .data-actions {
+  border-top-color: #3a3350;
+}
+
+.data-actions button,
+.data-actions .import-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: #f1f1f1;
+  color: #555;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.data-actions button:hover,
+.data-actions .import-label:hover {
+  background: #e4e4e4;
+}
+
+body.dark .data-actions button,
+body.dark .data-actions .import-label {
+  background: #2c2440;
+  color: #ccc;
+}
+
+body.dark .data-actions button:hover,
+body.dark .data-actions .import-label:hover {
+  background: #3a3350;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
