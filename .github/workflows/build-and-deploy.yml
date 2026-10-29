@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   preview:
-    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'main'"
+    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'feature/edit-and-dark-mode'"
     runs-on:
       - self-hosted
       - tianairiela/todo-list-app
@@ -21,7 +21,7 @@ jobs:
           GITHUB_TOKEN: '${{ github.token }}'
         run: 'if [ -f "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" ]; then printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | bash "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" preview; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''est déployé."; fi'
   production:
-    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name == 'main'"
+    if: "github.event_name == 'push' && !github.event.deleted && github.ref_name == 'feature/edit-and-dark-mode'"
     runs-on:
       - self-hosted
       - tianairiela/todo-list-app
