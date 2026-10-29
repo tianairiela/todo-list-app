@@ -9,46 +9,40 @@ permissions:
 jobs:
   preview:
     if: "github.event_name == 'push' && !github.event.deleted && github.ref_name != 'main'"
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - tianairiela/todo-list-app
     concurrency:
       group: 'preview-${{ github.ref_name }}'
       cancel-in-progress: false
     steps:
       - name: 'Deploy the preview'
         env:
-          SSH_HOST: '${{ secrets.SSH_HOST }}'
-          SSH_PORT: '${{ secrets.SSH_PORT }}'
-          SSH_USER: '${{ secrets.SSH_USER }}'
-          SSHPASS: '${{ secrets.SSH_PASSWORD }}'
           GITHUB_TOKEN: '${{ github.token }}'
-        run: 'printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | sshpass -e ssh -o StrictHostKeyChecking=accept-new -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" ''if [ -f deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh ]; then bash deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh preview; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''\''''est déployé."; fi'''
+        run: 'if [ -f "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" ]; then printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | bash "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" preview; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''est déployé."; fi'
   production:
     if: "github.event_name == 'push' && !github.event.deleted && github.ref_name == 'main'"
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - tianairiela/todo-list-app
     concurrency:
       group: production
       cancel-in-progress: false
     steps:
       - name: 'Deploy the production'
         env:
-          SSH_HOST: '${{ secrets.SSH_HOST }}'
-          SSH_PORT: '${{ secrets.SSH_PORT }}'
-          SSH_USER: '${{ secrets.SSH_USER }}'
-          SSHPASS: '${{ secrets.SSH_PASSWORD }}'
           GITHUB_TOKEN: '${{ github.token }}'
-        run: 'printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | sshpass -e ssh -o StrictHostKeyChecking=accept-new -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" ''if [ -f deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh ]; then bash deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh production; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''\''''est déployé."; fi'''
+        run: 'if [ -f "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" ]; then printf ''%s\n'' "$GITHUB_TOKEN" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" | bash "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" production; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''est déployé."; fi'
   remove-preview:
     if: "github.event_name == 'delete' && github.event.ref_type == 'branch'"
-    runs-on: ubuntu-24.04
+    runs-on:
+      - self-hosted
+      - tianairiela/todo-list-app
     concurrency:
       group: 'preview-${{ github.event.ref }}'
       cancel-in-progress: false
     steps:
       - name: 'Remove the preview'
         env:
-          SSH_HOST: '${{ secrets.SSH_HOST }}'
-          SSH_PORT: '${{ secrets.SSH_PORT }}'
-          SSH_USER: '${{ secrets.SSH_USER }}'
-          SSHPASS: '${{ secrets.SSH_PASSWORD }}'
           DELETED_BRANCH: '${{ github.event.ref }}'
-        run: 'printf ''%s\n'' "" "$GITHUB_REPOSITORY" "$DELETED_BRANCH" "" | sshpass -e ssh -o StrictHostKeyChecking=accept-new -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" ''if [ -f deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh ]; then bash deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh remove-preview; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''\''''est déployé."; fi'''
+        run: 'if [ -f "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" ]; then printf ''%s\n'' "" "$GITHUB_REPOSITORY" "$DELETED_BRANCH" "" | bash "$HOME/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh" remove-preview; else echo "~/deployment/preprodweb.ia-souveraine.fr/scripts/deploy.sh absent : connectez-vous au serveur depuis EVA Pilote, rien n''est déployé."; fi'
