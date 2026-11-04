@@ -5,6 +5,7 @@
 
 const STORAGE_KEY = "todo-app-tasks";
 const THEME_STORAGE_KEY = "todo-app-theme";
+const UNDO_TIMEOUT_MS = 6000;
 
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
@@ -13,9 +14,18 @@ const countLabel = document.getElementById("todo-count");
 const clearCompletedBtn = document.getElementById("clear-completed");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const themeToggleBtn = document.getElementById("theme-toggle");
+const undoSnackbar = document.getElementById("undo-snackbar");
+const undoMessage = document.getElementById("undo-message");
+const undoBtn = document.getElementById("undo-btn");
 
 let todos = loadTodos();
 let currentFilter = "all";
+
+/**
+ * Suivi de la dernière suppression annulable.
+ * @type {{ entries: Array<{todo: object, index: number}>, timeoutId: number } | null}
+ */
+let pendingUndo = null;
 
 /**
  * Charge les tâches depuis le localStorage.
@@ -140,13 +150,17 @@ function toggleTodo(id) {
 }
 
 /**
- * Supprime une tâche.
+ * Supprime une tâche et propose son annulation via un snackbar.
  * @param {string} id
  */
 function deleteTodo(id) {
-  todos = todos.filter((todo) => todo.id !== id);
+  const index = todos.findIndex((todo) => todo.id === id);
+  if (index === -1) return;
+
+  const [removed] = todos.splice(index, 1);
   saveTodos();
   render();
+  showUndoSnackbar("Tâche supprimée.", [{ todo: removed, index }]);
 }
 
 /**
@@ -210,12 +224,78 @@ function enterEditMode(li, todo) {
 }
 
 /**
- * Supprime toutes les tâches terminées.
+ * Supprime toutes les tâches terminées et propose leur restauration
+ * groupée via un snackbar.
  */
 function clearCompleted() {
-  todos = todos.filter((todo) => !todo.completed);
+  const removedEntries = [];
+
+  todos = todos.filter((todo, index) => {
+    if (!todo.completed) return true;
+    removedEntries.push({ todo, index });
+    return false;
+  });
+
+  if (removedEntries.length === 0) return;
+
   saveTodos();
   render();
+
+  const label =
+    removedEntries.length === 1
+      ? "1 tâche terminée supprimée."
+      : `${removedEntries.length} tâches terminées supprimées.`;
+  showUndoSnackbar(label, removedEntries);
+}
+
+// --- Annulation de suppression (snackbar "Annuler") ---
+
+/**
+ * Affiche le snackbar d'annulation avec le message donné, et programme
+ * sa disparition automatique après un délai. Toute suppression en attente
+ * d'annulation précédente est définitivement perdue (son timer est annulé).
+ * @param {string} message
+ * @param {Array<{todo: object, index: number}>} removedEntries
+ */
+function showUndoSnackbar(message, removedEntries) {
+  if (pendingUndo) {
+    clearTimeout(pendingUndo.timeoutId);
+  }
+
+  undoMessage.textContent = message;
+  undoSnackbar.classList.add("visible");
+
+  const timeoutId = window.setTimeout(hideUndoSnackbar, UNDO_TIMEOUT_MS);
+  pendingUndo = { entries: removedEntries, timeoutId };
+}
+
+/**
+ * Masque le snackbar d'annulation et oublie la suppression en attente.
+ */
+function hideUndoSnackbar() {
+  if (pendingUndo) {
+    clearTimeout(pendingUndo.timeoutId);
+    pendingUndo = null;
+  }
+  undoSnackbar.classList.remove("visible");
+}
+
+/**
+ * Restaure la ou les tâches de la dernière suppression, à leur position
+ * d'origine dans la liste, puis masque le snackbar.
+ */
+function undoLastDeletion() {
+  if (!pendingUndo) return;
+
+  [...pendingUndo.entries]
+    .sort((a, b) => a.index - b.index)
+    .forEach(({ todo, index }) => {
+      todos.splice(Math.min(index, todos.length), 0, todo);
+    });
+
+  saveTodos();
+  render();
+  hideUndoSnackbar();
 }
 
 /**
@@ -273,6 +353,8 @@ filterButtons.forEach((button) => {
 });
 
 themeToggleBtn.addEventListener("click", toggleTheme);
+
+undoBtn.addEventListener("click", undoLastDeletion);
 
 // --- Initialisation ---
 applyTheme(loadTheme());
