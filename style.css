@@ -292,6 +292,45 @@ body.dark .todo-item .due-date.overdue {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  overflow: hidden;
+}
+
+body.dark .progress-bar {
+  background: #2c2440;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.progress-label {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: #777;
+  min-width: 78px;
+  text-align: right;
+}
+
+body.dark .progress-label {
+  color: #aaa;
+}
+
 .todo-footer {
   display: flex;
   justify-content: space-between;
