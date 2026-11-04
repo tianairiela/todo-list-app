@@ -17,6 +17,8 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 const themeToggleBtn = document.getElementById("theme-toggle");
 const exportBtn = document.getElementById("export-btn");
 const importInput = document.getElementById("import-input");
+const progressFill = document.getElementById("progress-fill");
+const progressLabel = document.getElementById("progress-label");
 
 let todos = loadTodos();
 let currentFilter = "all";
@@ -193,6 +195,20 @@ function enableEditMode(li, todo) {
 }
 
 /**
+ * Met à jour la barre de progression selon la proportion de tâches terminées.
+ */
+function updateProgress() {
+  const total = todos.length;
+  const completedCount = todos.filter((todo) => todo.completed).length;
+  const percentage =
+    total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+  progressFill.style.width = `${percentage}%`;
+  progressLabel.textContent = `${percentage} % terminé`;
+  progressFill.parentElement.setAttribute("aria-hidden", total === 0);
+}
+
+/**
  * Affiche la liste des tâches dans le DOM.
  */
 function render() {
@@ -253,6 +269,7 @@ function render() {
 
   const remaining = todos.filter((todo) => !todo.completed).length;
   countLabel.textContent = `${remaining} tâche(s) restante(s)`;
+  updateProgress();
 }
 
 /**
