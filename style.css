@@ -14,6 +14,9 @@
   --completed-color: #aaaaaa;
   --empty-color: #999999;
   --footer-color: #777777;
+  --snackbar-bg: #2c2440;
+  --snackbar-text: #ffffff;
+  --snackbar-action: #a78bda;
 }
 
 body.dark-theme {
@@ -30,6 +33,9 @@ body.dark-theme {
   --completed-color: #777777;
   --empty-color: #8c8c9c;
   --footer-color: #bbbbbb;
+  --snackbar-bg: #0f0f1a;
+  --snackbar-text: #f1f1f1;
+  --snackbar-action: #bda4ec;
 }
 
 * {
@@ -232,6 +238,49 @@ body {
   color: var(--accent-color);
   cursor: pointer;
   font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.undo-snackbar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 20px);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 90vw;
+  background: var(--snackbar-bg);
+  color: var(--snackbar-text);
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  z-index: 1000;
+}
+
+.undo-snackbar.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.undo-snackbar span {
+  font-size: 0.9rem;
+}
+
+.undo-snackbar button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--snackbar-action);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
   text-decoration: underline;
 }
 
