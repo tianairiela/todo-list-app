@@ -10,6 +10,7 @@ Une application de liste de tâches simple, réalisée en **HTML**, **CSS** et *
 - **Marquer une tâche comme prioritaire** ⭐ (remontée automatique en tête de liste)
 - **Ajouter une date d'échéance** 📅 optionnelle, avec mise en évidence des tâches en retard
 - **Rechercher une tâche** 🔍 en temps réel, insensible à la casse et aux accents, combinée aux filtres
+- **Suivre sa progression** 📊 grâce à une barre indiquant le pourcentage de tâches terminées, mise à jour en temps réel
 - **Exporter / Importer les tâches** 💾 au format JSON (sauvegarde, transfert entre appareils)
 - Supprimer une tâche
 - Filtrer les tâches : **Toutes** / **En cours** / **Terminées**
@@ -41,6 +42,10 @@ Aucune installation ni serveur n'est nécessaire.
 
 - Cliquez sur **⬇️ Exporter** pour télécharger un fichier `todo-list-AAAA-MM-JJ.json` contenant toutes vos tâches.
 - Cliquez sur **⬆️ Importer** et sélectionnez un fichier JSON précédemment exporté pour restaurer vos tâches (remplace la liste actuelle).
+
+### 📊 Barre de progression
+
+Une barre de progression est affichée sous la liste des tâches. Elle indique en temps réel le pourcentage de tâches terminées par rapport au nombre total de tâches, et se met à jour automatiquement à chaque ajout, suppression ou changement de statut.
 
 ## 🛠️ Technologies
 
